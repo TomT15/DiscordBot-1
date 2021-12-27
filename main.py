@@ -90,6 +90,9 @@ def sendFriendlyResponse(message):
 
 
 @bot.event
+async def on_ready():
+    print('Hello, I am online.')
+
 async def on_message(message):
     msg = message.content
     # CHECKS IF THE MESSAGE THAT WAS SENT IS EQUAL TO "HELLO".
@@ -108,13 +111,26 @@ async def on_message(message):
         content = ''
         msgSent = await message.channel(filewriting.writeToFile(content))
 
+    # Old idea, instead just use bottoms as active updates to the count.
     if msg.startswith('$') and msg.endswith('$'):
         # check model property for name
         x = getattr(weapons, msg, 0)
         if(x != 0):
             #TODO: write regular expression statement that will ignore the model name, and instead grab the int value passed in the string
-            value = re.search('expression', msg)
+            expression = ''
+            value = re.search(expression, msg)
             setattr(weapons, msg, value)
+
+    #New idea, add all weapons into a long list and an associated button to them as such
+    """
+    Weapon1
+    Weapon2
+    Weapon3
+
+    Then their associated reactions
+    Smile, Sad, Happy
+    """
+    #Then add code so that everytime that button is hit, it adds one to the count.
 
 
 bot.run(DISCORD_TOKEN)
