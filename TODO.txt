@@ -1,0 +1,5 @@
+1. Create model and object of all the weapons in hunt showdown.
+2. Create a txt doc to store the model on temporarily
+    1. Model needs to be written and read in JSON
+3. Create dynamic model so we have the ability to add more items later
+
