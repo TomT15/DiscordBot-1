@@ -15,7 +15,8 @@ import os
 
 # Custom imports
 from WritingToFile import filewriting
-from WeaponDeaths import Weapons
+#TODO: Populate another model to hold the deaths
+#from WeaponDeaths import Weapons
 
 import re
 
@@ -31,8 +32,10 @@ DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 # GETS THE CLIENT OBJECT FROM DISCORD.PY. CLIENT IS SYNONYMOUS WITH BOT.
 bot = discord.Client()
 
-# initalize model
-weapons = Weapons()
+# initalize model 
+# #https://www.edureka.co/blog/init-in-python/
+def _init_(self, weapons):
+    self.weapon
 
 # EVENT LISTENER FOR WHEN THE BOT HAS SWITCHED FROM OFFLINE TO ONLINE.
 
@@ -85,8 +88,29 @@ def sendFriendlyResponse(message):
     finally:
         result = "Hey Shithead " + "<:" + returnedEmoji.name + \
             ":" + str(returnedEmoji.id) + ">"
-
     return result
+
+#add a random reaction based on how many lines there are in the message
+def add_Reactions(message, user):
+    smileEmoji = ''
+    grinEmoji = ''
+    sweat_smile = ''
+        
+    for emoji in bot.guild.emojis:
+        if emoji.name.find("smile") != -1:
+            smileEmoji = emoji
+        if emoji.name.find("grin") != -1:
+            grinEmoji = emoji
+        if emoji.name.find("sweat_smile") != -1:
+            sweat_smile = emoji
+    reactions = [smileEmoji, grinEmoji, sweat_smile]
+    #loop through message per line and add an emoji
+    x= "\n"
+    counter = 1
+    for x in message.content:
+        bot.add_reaction(message,reactions[counter])    
+
+
 
 
 @bot.event
@@ -102,7 +126,9 @@ async def on_message(message):
 
         # Add reaction to the end of the message
         await msgSent.add_reaction(getDiscordKappa(msgSent))
-
+        
+    
+    '''
     if msg.startswith('$online'):
         await message.channel.send('Hello, I am online.')
 
@@ -111,15 +137,8 @@ async def on_message(message):
         content = ''
         msgSent = await message.channel(filewriting.writeToFile(content))
 
-    # Old idea, instead just use bottoms as active updates to the count.
-    if msg.startswith('$') and msg.endswith('$'):
-        # check model property for name
-        x = getattr(weapons, msg, 0)
-        if(x != 0):
-            #TODO: write regular expression statement that will ignore the model name, and instead grab the int value passed in the string
-            expression = ''
-            value = re.search(expression, msg)
-            setattr(weapons, msg, value)
+        msgSent = await message.channel.send(sendFriendlyResponse(message))
+
 
     #New idea, add all weapons into a long list and an associated button to them as such
     """
@@ -132,6 +151,31 @@ async def on_message(message):
     """
     #Then add code so that everytime that button is hit, it adds one to the count.
 
+    #Counter Code when an emoji is reacted to.
+    if msg == "$Start":
+        #Generate contents and add 3 reactions
+        contents = """
+        Option 1
+        Option 2
+        Option 3
+        """
+        msgSent = await message.channel.send(contents)
+
+        # Add reaction to the end of the message
+        await add_Reactions(msgSent, bot)
+'''
+    
+'''
+    # Old idea, instead just use bottoms as active updates to the count.
+    if msg.startswith('$') and msg.endswith('$'):
+        # check model property for name
+        x = getattr(weapons, msg, 0)
+        if(x != 0):
+            #TODO: write regular expression statement that will ignore the model name, and instead grab the int value passed in the string
+            expression = ''
+            value = re.search(expression, msg)
+            setattr(weapons, msg, value)
+'''
 
 bot.run(DISCORD_TOKEN)
 
