@@ -8,6 +8,7 @@
 
 # IMPORT DISCORD.PY. ALLOWS ACCESS TO DISCORD'S API.
 from datetime import datetime
+from logging import error
 import discord
 
 # IMPORT THE OS MODULE.
@@ -34,37 +35,8 @@ bot = discord.Client()
 
 # initalize model 
 # #https://www.edureka.co/blog/init-in-python/
-def _init_(self, weapons):
-    self.weapon
-
-# EVENT LISTENER FOR WHEN THE BOT HAS SWITCHED FROM OFFLINE TO ONLINE.
-
-# initalization startup
-
-
-@bot.event
-async def on_ready():
-    print('We have logged in as \"{0.user}\"'.format(bot))
-
-    from datetime import time
-    currentTime = datetime.now()
-    print("Current time: ", currentTime.strftime("%H:%M:%S"))
-
-    # CREATES A COUNTER TO KEEP TRACK OF HOW MANY GUILDS / SERVERS THE BOT IS CONNECTED TO.
-    guild_count = 0
-
-    # LOOPS THROUGH ALL THE GUILD / SERVERS THAT THE BOT IS ASSOCIATED WITH.
-    for guild in bot.guilds:
-        # PRINT THE SERVER'S ID AND NAME.
-        print(f"- {guild.id} (name: {guild.name})")
-
-        # INCREMENTS THE GUILD COUNTER.
-        guild_count = guild_count + 1
-
-    # PRINTS HOW MANY GUILDS / SERVERS THE BOT IS IN.
-    print("SampleDiscordBot is in " + str(guild_count) + " guilds.")
-
-# EVENT LISTENER FOR WHEN A NEW MESSAGE IS SENT TO A CHANNEL.
+# def _init_(self, weapons):
+#     self.weapon
 
 # Generic String catch
 
@@ -91,34 +63,77 @@ def sendFriendlyResponse(message):
     return result
 
 #add a random reaction based on how many lines there are in the message
-def add_Reactions(message, user):
-    smileEmoji = ''
-    grinEmoji = ''
-    sweat_smile = ''
+# def add_Reactions(message, user):
+#     smileEmoji = ''
+#     grinEmoji = ''
+#     sweat_smile = ''
         
-    for emoji in bot.guild.emojis:
-        if emoji.name.find("smile") != -1:
-            smileEmoji = emoji
-        if emoji.name.find("grin") != -1:
-            grinEmoji = emoji
-        if emoji.name.find("sweat_smile") != -1:
-            sweat_smile = emoji
-    reactions = [smileEmoji, grinEmoji, sweat_smile]
-    #loop through message per line and add an emoji
-    x= "\n"
-    counter = 1
-    for x in message.content:
-        bot.add_reaction(message,reactions[counter])    
+#     for emoji in bot.guilds:
+#         if emoji.name.find("smile") != -1:
+#             smileEmoji = emoji
+#         if emoji.name.find("grin") != -1:
+#             grinEmoji = emoji
+#         if emoji.name.find("sweat_smile") != -1:
+#             sweat_smile = emoji
+#     reactions = [smileEmoji, grinEmoji, sweat_smile]
+#     #loop through message per line and add an emoji
+#     x= "\n"
+#     counter = 1
+#     for x in message.content:
+#         bot.add_reaction(message,reactions[counter])
+
+def add_Reactions(message, user):
+    nlines = message.content.count('\n')
+    if nlines == 0:
+        nlines = len(message.splitlines())
+    if nlines == 0:
+        print('Error')
+        return
+    
+    emojisToFind = ['smile', 'grin', 'sweat_smile']
+
+    for anEmoji in emojisToFind:
+        emoji = discord.utils.get(message.guild.emojis, name=anEmoji)
+        await message.add_reaction(emoji)
 
 
 
-
+# initalization startup
 @bot.event
 async def on_ready():
     print('Hello, I am online.')
+    print('We have logged in as \"{0.user}\"'.format(bot))
 
+    from datetime import time
+    currentTime = datetime.now()
+    print("Current time: ", currentTime.strftime("%H:%M:%S"))
+
+    # CREATES A COUNTER TO KEEP TRACK OF HOW MANY GUILDS / SERVERS THE BOT IS CONNECTED TO.
+    guild_count = 0
+
+    # LOOPS THROUGH ALL THE GUILD / SERVERS THAT THE BOT IS ASSOCIATED WITH.
+    for guild in bot.guilds:
+        # PRINT THE SERVER'S ID AND NAME.
+        print(f"- {guild.id} (name: {guild.name})")
+
+        # INCREMENTS THE GUILD COUNTER.
+        guild_count = guild_count + 1
+
+    # PRINTS HOW MANY GUILDS / SERVERS THE BOT IS IN.
+    print("SampleDiscordBot is in " + str(guild_count) + " guilds.")
+
+@bot.event
 async def on_message(message):
     msg = message.content
+    #Aurthor of the message
+    user = message.author
+    #What channel of message
+    channel = message.channel
+
+    if user == bot.user:
+        return
+
+    #Basic check
     # CHECKS IF THE MESSAGE THAT WAS SENT IS EQUAL TO "HELLO".
     if msg == "Hello":
         # SENDS BACK A MESSAGE TO THE CHANNEL.
@@ -126,12 +141,12 @@ async def on_message(message):
 
         # Add reaction to the end of the message
         await msgSent.add_reaction(getDiscordKappa(msgSent))
-        
+            
     
-    '''
     if msg.startswith('$online'):
         await message.channel.send('Hello, I am online.')
 
+    #TODO:Setup file saving system
     if msg == "$savefile":
         # TODO: Generate content to write out
         content = ''
@@ -154,16 +169,14 @@ async def on_message(message):
     #Counter Code when an emoji is reacted to.
     if msg == "$Start":
         #Generate contents and add 3 reactions
-        contents = """
-        Option 1
-        Option 2
-        Option 3
-        """
-        msgSent = await message.channel.send(contents)
+        #contents = "Option 1\n Option 2\n Option 3"
+        contents = ['option1', 'option2', 'option3']
 
-        # Add reaction to the end of the message
-        await add_Reactions(msgSent, bot)
-'''
+        msgSent = await message.channel.send('\n'.join(map(str, contents)))
+
+        #Add reaction to the end of the message
+        add_Reactions(msgSent, bot)
+
     
 '''
     # Old idea, instead just use bottoms as active updates to the count.
